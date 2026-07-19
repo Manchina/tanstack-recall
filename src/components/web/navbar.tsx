@@ -2,24 +2,10 @@ import { Button, buttonVariants } from "../ui/button"
 import { ThemeToggle } from "./theme-toggle"
 import { Link } from "@tanstack/react-router"
 import { authClient } from "@/lib/auth-client"
-import { toast } from "sonner"
+import { handleSignOut } from "@/utils/auth"
 
-export function Navbaar() {
+export function Navbar() {
     const { data: session, isPending } = authClient.useSession()
-
-    const handleSignOut = async () => {
-        await authClient.signOut({
-            fetchOptions: {
-                onSuccess: () => {
-                    toast.success('Signed out successfully')
-                },
-                onError: ({error}) => {
-                    toast.error(error.message)
-                }
-            }
-        })
-    }
-
     return (
         <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur text-foreground supports-backdrop-filter:bg-background/60">
             <div className="flex h-16 w-full items-center justify-between px-4 md:px-8">
@@ -35,7 +21,7 @@ export function Navbaar() {
                     {isPending ? null : session ? (
                         <>
                         <Button onClick={handleSignOut} className={buttonVariants({ variant: 'secondary' })}>Logout</Button>
-                        <Link to="/" className={buttonVariants()}>Dashboard</Link>
+                        <Link to="/dashboard" className={buttonVariants()}>Dashboard</Link>
                         </>
                     ): (
                         <>

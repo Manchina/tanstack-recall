@@ -1,72 +1,76 @@
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from '@/components/ui/card'
 import {
   Field,
   FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { Link, useNavigate } from "@tanstack/react-router"
-import { useForm } from "@tanstack/react-form"
-import { loginSchema } from "#/schemas/auth"
-import { authClient } from "@/lib/auth-client"
-import { toast } from "sonner"
+} from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { useForm } from '@tanstack/react-form'
+import { loginSchema } from '#/schemas/auth'
+import { authClient } from '@/lib/auth-client'
+import { toast } from 'sonner'
+import { useTransition } from 'react'
 
 export function LoginForm() {
   const navigate = useNavigate()
+  const [isPending, startTransition] = useTransition()
+
   const form = useForm({
-      defaultValues: {
-        email: "",
-        password: "",
-      },
-      validators: {
-        onSubmit: loginSchema,
-      },
-      onSubmit: async ({ value }) => {
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+    validators: {
+      onSubmit: loginSchema,
+    },
+    onSubmit: ({ value }) => {
+      startTransition(async () => {
         await authClient.signIn.email({
-        email: value.email,
-        password: value.password,
-        callbackURL: '/dashboard',
-        fetchOptions: {
-          onSuccess: () => {
-            toast.success("Logged in successfully")
-            navigate({
-              to: "/",
-            })
+          email: value.email,
+          password: value.password,
+          //callbackURL: '/dashboard',
+          fetchOptions: {
+            onSuccess: () => {
+              toast.success('Logged in successfully')
+              navigate({
+                to: '/dashboard',
+              })
+            },
+            onError: ({ error }) => {
+              toast.error(error.message)
+            },
           },
-          onError: ({error}) => {
-            toast.error(error.message)
-          }
-        }
+        })
       })
-      },
+    },
   })
 
   return (
-      <Card className="max-w-md w-full">
-        <CardHeader>
-          <CardTitle>Login to your account</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              form.handleSubmit()
-            }}
-          >
-            <FieldGroup>
-    
+    <Card className="max-w-md w-full">
+      <CardHeader>
+        <CardTitle>Login to your account</CardTitle>
+        <CardDescription>
+          Enter your email below to login to your account
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            form.handleSubmit()
+          }}
+        >
+          <FieldGroup>
             <form.Field
               name="email"
               children={(field) => {
@@ -120,15 +124,17 @@ export function LoginForm() {
                 )
               }}
             />
-              <Field>
-                <Button type="submit">Login</Button>
-                <FieldDescription className="text-center">
-                  Don&apos;t have an account? <Link to='/signup'>Sign up</Link>
-                </FieldDescription>
-              </Field>
-            </FieldGroup>
-          </form>
-        </CardContent>
-      </Card>
+            <Field>
+              <Button disabled={isPending} type="submit">
+                {isPending ? 'Logging in...' : 'Login'}
+              </Button>
+              <FieldDescription className="text-center">
+                Don&apos;t have an account? <Link to="/signup">Sign up</Link>
+              </FieldDescription>
+            </Field>
+          </FieldGroup>
+        </form>
+      </CardContent>
+    </Card>
   )
 }

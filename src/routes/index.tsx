@@ -1,4 +1,4 @@
-import { Navbaar } from '#/components/web/navbar'
+import { Navbar } from '#/components/web/navbar'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/')({ component: App })
@@ -6,7 +6,7 @@ export const Route = createFileRoute('/')({ component: App })
 function App() {
   return (
     <div>
-      <Navbaar />
+      <Navbar />
     </div>
   )
 }

@@ -19,9 +19,12 @@ import { useForm } from "@tanstack/react-form"
 import { signupSchema } from "@/schemas/auth"
 import { authClient } from "@/lib/auth-client"
 import { toast } from "sonner"
+import { useTransition } from "react"
 
 export function SignupForm() {
   const navigate = useNavigate()
+  const [isPending, startTransition] = useTransition()
+
   const form = useForm({
     defaultValues: {
       fullName: "",
@@ -31,8 +34,9 @@ export function SignupForm() {
     validators: {
       onSubmit: signupSchema,
     },
-    onSubmit: async ({ value }) => {
-      await authClient.signUp.email({
+    onSubmit: ({ value }) => {
+      startTransition(async() => {
+        await authClient.signUp.email({
         name: value.fullName,
         email: value.email,
         password: value.password,
@@ -41,13 +45,14 @@ export function SignupForm() {
           onSuccess: () => {
             toast.success("Account created successfully")
             navigate({
-              to: "/",
+              to: "/dashboard",
             })
           },
           onError: ({error}) => {
             toast.error(error.message)
           }
         }
+      })
       })
     },
   })
@@ -150,7 +155,9 @@ export function SignupForm() {
 
             <FieldGroup>
               <Field>
-                <Button type="submit">Create Account</Button>
+                <Button disabled={isPending} type="submit">
+                  {isPending ? 'Creating account...' : 'Create Account'}
+                </Button>
                 <FieldDescription className="px-6 text-center">
                   Already have an account? <Link to="/login">Login</Link>
                 </FieldDescription>
