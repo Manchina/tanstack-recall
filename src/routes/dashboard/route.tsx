@@ -2,7 +2,7 @@ import { AppSidebar } from '#/components/app-sidebar'
 import { Separator } from '#/components/ui/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '#/components/ui/sidebar'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
-import { getSessionFn } from '../data/session'
+import { getSessionFn } from '../../data/session'
 
 export const Route = createFileRoute('/dashboard')({
   component: RouteComponent,
